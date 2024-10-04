@@ -1,0 +1,29 @@
+.log-in {
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+}
+
+.log-in__label {
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.log-in__text-field {
+  background-color: rgba(22, 24, 35, 0.06);
+  padding: 0 16px;
+  font-size: 18px;
+  line-height: 48px;
+  border: 1px solid rgba(22, 24, 35, 0.12);
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.log-in__text-field:last-of-type {
+  margin-bottom: 40px;
+}
+
+.log-in__button {
+  height: 50px;
+}

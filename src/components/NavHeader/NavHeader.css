@@ -1,0 +1,10 @@
+.footer {
+  font-size: 12px;
+  align-self: end;
+}
+
+.footer__menu {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
