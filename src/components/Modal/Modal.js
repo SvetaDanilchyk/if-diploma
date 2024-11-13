@@ -1,11 +1,9 @@
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { createPortal } from 'react-dom';
-
-import { Button } from '../Button';
-
-import sprite from "../../img/sprite.svg";
-
+//styles
 import './Modal.css';
+//img
+import sprite from "../../img/sprite.svg";
 
 export const Modal = forwardRef(({ title, children }, ref) => {
   const [showModal, setShowModal] = useState(false);
@@ -29,11 +27,9 @@ export const Modal = forwardRef(({ title, children }, ref) => {
         <div className="modal-mask" onClick={closeModal} />
         <div className="modal">
           <div className="modal__header">
-           {/*  <Button variant="icon"> */}
                 <svg  className="modal__crosse"  onClick={closeModal}>
                   <use href={`${sprite}#close`} />
                 </svg>
-      {/*       </Button> */}
           </div>
           <h2 className="modal__title">{title}</h2>
           <div className="modal-content">

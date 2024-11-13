@@ -69,9 +69,6 @@ const cardStyles = (theme) => ({
     fontWeight: "900",
     marginBottom: "12px",
   }, 
-
-
-
   book: {
     paddingTop: "120px",
     paddingBottom: "120px",

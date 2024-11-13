@@ -12,5 +12,6 @@ export const INITIAL_STATE = {
     email: null,
     name: null,
     password: null,
+    userBooks: [],
   },
 };

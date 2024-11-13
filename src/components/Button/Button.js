@@ -1,7 +1,6 @@
 import React from "react";
 import { useTheme } from "react-jss";
 import classNames from "classnames";
-
 //components
 import { useButtonStyles } from "./Button.styles";
 

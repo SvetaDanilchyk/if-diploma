@@ -2,23 +2,21 @@ import React, { useRef, useState } from "react";
 import classNames from "classnames";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
-
+import { useDispatch } from "react-redux";
 //styles
 import { useHeaderStyles } from "./Header.styles";
-
-//img
-import sprite from "../../img/sprite.svg";
-
 //components
 import { Dropdown } from "../Dropdown";
 import { Container } from "../Container";
 import { Search } from "../Search";
 import { Button } from "../Button";
 import { LogInModal } from "../LogInModal/LogInModal";
-
 //constans
 import { PAGE, PATH } from "../../constans/paths";
-
+//stoore
+import { resetSearchResults } from "../../store/slices/search.slice";
+//img
+import sprite from "../../img/sprite.svg";
 
 export const Header = ({label1, label2, account}) => {
   const logInRef = useRef(null);
@@ -26,10 +24,14 @@ export const Header = ({label1, label2, account}) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const classes = useHeaderStyles();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
+  const dispatch = useDispatch();
 
   const handleButtonClick = () => {
     setIsDropdownOpen((prev) => !prev);
+  };
+
+  const handleLogoClick = () => {
+    dispatch(resetSearchResults()); 
   };
 
   return (
@@ -40,6 +42,7 @@ export const Header = ({label1, label2, account}) => {
           key={PAGE.home}
           to={PATH.home}
           className={classNames(classes.logoButton)}
+          onClick={handleLogoClick}
         >
            <svg>
             <use href={`${sprite}#logo`} />
@@ -53,6 +56,7 @@ export const Header = ({label1, label2, account}) => {
                   onClick={() => {
                     if(label1 === "Log in") {
                       setIsSignUp(false);
+                      console.log('logInRef',logInRef);
                       logInRef.current.open();
                     } else {
                       navigate(PATH.home);

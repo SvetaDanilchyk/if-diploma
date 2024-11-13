@@ -5,6 +5,7 @@ export const PAGE = {
   home: "books",
   bookDetails: "bookDetails/:bookId",
   userOrders: "orders",
+  settings: "/settings",
   
 };
 
@@ -16,4 +17,5 @@ export const PATH = {
   home: "/books",
   bookDetails: "/bookDetails/:bookId",
   userOrders: "/orders",
+  settings: "/settings",
 };

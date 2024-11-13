@@ -2,7 +2,7 @@ import { createUseStyles } from "react-jss";
 
 const dropdownStyles = {
   dropdown: {
-    position: "absolute",
+   /*  position: "absolute",
     top: "100%",
     right: "50%",
     transform: "translateX(50%)",
@@ -10,7 +10,7 @@ const dropdownStyles = {
     zIndex: "1",
     cursor: "pointer",
     backgroundColor: 'peenk',
-    borderRadius: "8px",
+    borderRadius: "8px", */
   },
   dropdownMenu: {
     listStyleType: "none",

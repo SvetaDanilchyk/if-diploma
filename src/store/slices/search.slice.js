@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-
 //constans
 import { booksUrl } from "../../constans/url";
 
+const getRandomRating = () => Math.floor(Math.random() * 5) + 1;
 
 export const searchSlice = createSlice({
   name: "search",
@@ -11,6 +11,7 @@ export const searchSlice = createSlice({
     searchResults: [],
     error: null,
     loading: false,
+    searchFlag: false,
   },
   reducers: {
     fetchHomeBooksRequest(state) {
@@ -18,12 +19,22 @@ export const searchSlice = createSlice({
       state.error = null;
     },
     fetchHomeBooksSuccess(state, action) {
-      state.homeBooks = action.payload;
-      console.log('state.action.payload',state);
+      const savedRatings = JSON.parse(localStorage.getItem("bookRatings")) || {};
+      
+      const booksWithRatings = action.payload.map(book => {
+        if (!savedRatings[book.id]) {
+          savedRatings[book.id] = getRandomRating();
+        }
+        return { ...book, rating: savedRatings[book.id] };
+      });
+
+      localStorage.setItem("bookRatings", JSON.stringify(savedRatings));
+      state.homeBooks = booksWithRatings;
       state.loading = false;
     },
     fetchBooksSuccess(state, action) {
       state.searchResults = action.payload;
+      state.searchFlag = true;
       state.loading = false;
     },
     fetchBooksFailure(state, action) {
@@ -32,6 +43,7 @@ export const searchSlice = createSlice({
     },
     resetSearchResults(state) {
       state.searchResults = [];
+      state.searchFlag = false;
     },
   },
 });
@@ -39,25 +51,31 @@ export const searchSlice = createSlice({
 export const fetchHomeBooks = () => async (dispatch) => {
   dispatch(fetchHomeBooksRequest());
   try {
+    console.log("Fetching books from:", booksUrl); 
     const response = await fetch(booksUrl);
     const data = await response.json();
+    console.log("Fetched books data:", data);
     dispatch(fetchHomeBooksSuccess(data));
   } catch (error) {
+    console.error("Error fetching books:", error); 
     dispatch(fetchBooksFailure(error.message));
   }
 };
 
-export const fetchBooks =
-  (query = "") =>
-  async (dispatch) => {
+
+  export const fetchBooks = (query = "") => async (dispatch, getState) => {
+    dispatch(fetchHomeBooksRequest());
+    
     try {
-      const urlBooks = new URL(booksUrl);
-      if (query) {
-        urlBooks.searchParams.append("search", query);
-      }
-      const response = await fetch(urlBooks);
-      const data = await response.json();
-      dispatch(fetchBooksSuccess(data));
+      const state = getState();
+      const { homeBooks } = state.search;
+      const filteredBooks = homeBooks.filter(book =>
+        book.name.toLowerCase().includes(query.toLowerCase()) || 
+        book.author.toLowerCase().includes(query.toLowerCase())
+      );
+  
+      dispatch(fetchBooksSuccess(filteredBooks));
+  
     } catch (error) {
       dispatch(fetchBooksFailure(error.message));
     }

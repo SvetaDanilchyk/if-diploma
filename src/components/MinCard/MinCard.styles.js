@@ -26,26 +26,6 @@ const minCardStyles = (theme) => ({
     height: '100%',
     objectFit: 'cover',
   },
-
-/*   container: {
-    display: 'grid',
-    columnGap: '12px',
-    gridTemplateColumns: '122px 122px', // 122px 122px
-  },  */
-
- /*  wrapper: {
-    width: '122px',
-  },  */
-  /* wrapperImg: {
-    width: '122px',
-    height: '185px',
-  }, */ 
-
-/*   image: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  }, */
   descrWrapper: {
     paddingRight: '76px',
   },
@@ -108,9 +88,6 @@ const minCardStyles = (theme) => ({
     fontWeight: '900',
     marginBottom: '12px',
   }, 
-
-
-
   book: {
     paddingTop: '120px',
     paddingBottom: '120px',

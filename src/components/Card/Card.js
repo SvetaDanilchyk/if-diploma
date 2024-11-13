@@ -1,12 +1,9 @@
 import React from "react";
 import classNames from "classnames";
-
 //styles
 import { useCardStyles } from "./Card.styles";
-
 //components
 import { Container } from "../Container";
-
 //img
 import sprite from "../../img/sprite.svg";
 
