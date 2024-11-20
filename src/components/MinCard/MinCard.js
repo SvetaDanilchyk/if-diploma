@@ -1,10 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+//styles
 import { useminCardStyles } from "./MinCard.styles";
+//components
 import { Button } from "../Button";
-import sprite from "../../img/sprite.svg";
+//store
 import { addUserBook, addUserWaitingBook, removeUserBook } from "../../store/slices/books.slice";
+//img
+import sprite from "../../img/sprite.svg";
 
 
 export const MinCard = ({ id, name, author, imageUrl, remainingDays, rating, status = "Available" }) => {
@@ -18,7 +22,6 @@ export const MinCard = ({ id, name, author, imageUrl, remainingDays, rating, sta
 
   const isBookTakenByCurrentUser = userBooks.some((book) => book.id === id && book.status === "Taken");
   const isBookInWaitingForCurrentUser = waitingBooks.some((book) => book.id === id);
-
 
   const isBookTakenByOthers =
     !isBookTakenByCurrentUser &&
@@ -57,6 +60,7 @@ export const MinCard = ({ id, name, author, imageUrl, remainingDays, rating, sta
     }
   };
 
+
   return (
     <div className={classes.container} id={id}>
       <Link to={`/bookDetails/${id}`}>
@@ -66,7 +70,14 @@ export const MinCard = ({ id, name, author, imageUrl, remainingDays, rating, sta
       </Link>
       <div className={classes.wrapper}>
         <button className={classes.status}>{currentStatus}</button>
-        <div>{remainingDays > 0 ? `${remainingDays} days` : "Expired"}</div>
+       {/*  <div>{remainingDays > 0 ? `${remainingDays} days` : "Expired"}</div> */}
+       <div>
+        {status === "Waiting for" && remainingDays > 0
+          ? `${remainingDays} days`
+          : status === "Waiting for"
+          ? "Expired"
+          : ""}
+      </div>
         <h2 className={classes.bookTitle}>{splitName}</h2>
         <h3 className={classes.authorSubtitle}>by {author}</h3>
         <div className={classes.starWrapper}>
@@ -83,3 +94,4 @@ export const MinCard = ({ id, name, author, imageUrl, remainingDays, rating, sta
     </div>
   );
 };
+

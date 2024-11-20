@@ -13,9 +13,11 @@ import { Footer } from '../Footer';
 import { fetchHomeBooks } from "../../store/slices/search.slice";
 import { loadStateFromLocalStorage } from '../../store/slices/auth.slice';
 import { loadUserFromLocalStorage, setUser } from '../../store/slices/user.slice';
+
 //constans
 import { AUTH_STATUSES } from '../../constans/authStatuses';
 import { PATH } from '../../constans/paths';
+import { checkBookExpiry } from '../../store/slices/books.slice';
 
 function App() {
   const { status, user } = useSelector((state) => state.auth);
@@ -23,9 +25,19 @@ function App() {
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.search);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      dispatch(checkBookExpiry());
+    },  6 * 60 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
+   
 useEffect(() => {
   const savedAuth = JSON.parse(localStorage.getItem('auth'));
   const savedUserId = localStorage.getItem('currentUserId');
+ 
 
   if (savedAuth?.status === AUTH_STATUSES.loggedIn && savedUserId) {
     dispatch(loadStateFromLocalStorage());
@@ -41,9 +53,8 @@ useEffect(() => {
 }, [dispatch, navigate]);
 
 useEffect(() => {
-  if (status === AUTH_STATUSES.loggedIn && user?.id) { 
+  if (status === AUTH_STATUSES.loggedIn) { 
     dispatch(fetchHomeBooks());
-    localStorage.setItem('currentUserId', user.id);
   } else if (status === AUTH_STATUSES.loggedOut) {
     navigate(PATH.index);
   }

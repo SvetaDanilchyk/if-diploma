@@ -27,7 +27,7 @@ export const searchSlice = createSlice({
         }
         return { ...book, rating: savedRatings[book.id] };
       });
-
+      
       localStorage.setItem("bookRatings", JSON.stringify(savedRatings));
       state.homeBooks = booksWithRatings;
       state.loading = false;
@@ -51,10 +51,8 @@ export const searchSlice = createSlice({
 export const fetchHomeBooks = () => async (dispatch) => {
   dispatch(fetchHomeBooksRequest());
   try {
-    console.log("Fetching books from:", booksUrl); 
     const response = await fetch(booksUrl);
     const data = await response.json();
-    console.log("Fetched books data:", data);
     dispatch(fetchHomeBooksSuccess(data));
   } catch (error) {
     console.error("Error fetching books:", error); 

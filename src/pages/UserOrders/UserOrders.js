@@ -6,11 +6,11 @@ import { useHomeStyles } from "../../components/Home/Home.styles";
 import { Container } from "../../components/Container";
 import { MinCard } from "../../components/MinCard";
 
-const getRemainingDays = (takenDate) => {
+const getRemainingDays = (takenDate, maxDays = 20) => {
   const now = Date.now();
   const takenTime = new Date(takenDate).getTime();
-  const daysPassed = Math.floor((now - takenTime) / (1000 * 60 * 60 * 24));
-  const daysLeft = 20 - daysPassed;
+  const daysPassed = Math.floor((now - takenTime) / (1000 * 60));
+  const daysLeft = maxDays - daysPassed;
   return daysLeft > 0 ? daysLeft : 0;
 };
 

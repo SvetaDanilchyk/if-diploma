@@ -20,7 +20,7 @@ export const Home = () => {
     () => homeBooks.slice(0, visibleBooks),
     [homeBooks, visibleBooks]
   );
-  
+ 
   if (error) {
     return <p>Error: {error}</p>;
   }
