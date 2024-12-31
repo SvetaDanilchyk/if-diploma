@@ -4,7 +4,8 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 
 //slices
 import { persistedReducer } from "./slices";
-
+//middleware
+import localStorageMiddleware from "./localStorageMiddleware";
 
 export const store = configureStore({
   reducer: persistedReducer,
@@ -13,7 +14,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: ["persist/PERSIST"],
       },
-    }),
+    }).concat(localStorageMiddleware),
   devTools: process.env.NODE_ENV !== "production",
 });
 

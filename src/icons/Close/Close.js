@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react";
 
 export const Close = ({ className }) => (
   <svg className={className}>
-    <use href="#close"/>
+    <use href="#close" />
   </svg>
 );

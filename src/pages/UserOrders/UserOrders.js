@@ -1,62 +1,83 @@
 import React from "react";
 import { useSelector } from "react-redux";
-//styles
+import classNames from "classnames";
+// styles
 import { useHomeStyles } from "../../components/Home/Home.styles";
-//components
+import { useUserOrderStyles } from "./UserOrders.styles";
+// components
 import { Container } from "../../components/Container";
 import { MinCard } from "../../components/MinCard";
+// selectors
+import {
+  selectUserBooks,
+  selectWaitingBooks,
+} from "../../store/slices/books.slice";
 
 const getRemainingDays = (takenDate, maxDays = 20) => {
   const now = Date.now();
   const takenTime = new Date(takenDate).getTime();
-  const daysPassed = Math.floor((now - takenTime) / (1000 * 60));
+  const daysPassed = Math.floor((now - takenTime) / (1000 * 60 * 60 * 24));
   const daysLeft = maxDays - daysPassed;
   return daysLeft > 0 ? daysLeft : 0;
 };
 
 export const UserOrders = () => {
-  const { id: userId } = useSelector((state) => state.user);
-  const userBooks = useSelector((state) => state.books.userBooks[userId] || []);
-  const waitingBooks = useSelector((state) => state.books.waitingBooks[userId] || []);
   const classes = useHomeStyles();
-  const takenBooks = userBooks.filter((book) => book.status === "Taken");
+  const classesOrders = useUserOrderStyles();
+  const userId = useSelector((state) => state.user.id);
+  const waitingBooks = useSelector((state) =>
+    selectWaitingBooks(state, userId),
+  );
+  const userBooks = useSelector((state) => selectUserBooks(state, userId));
+
+  const takenBooks = React.useMemo(
+    () => userBooks.filter((book) => book.status === "Taken"),
+    [userBooks],
+  );
 
   return (
-    <div>
-      <h2>Waiting for</h2>
-      <Container className={classes.wrapper}>
+    <>
+      <Container className={classesOrders.wrap}>
+        <h2 className={classesOrders.title}>Waiting for</h2>
         {waitingBooks.length > 0 ? (
-          waitingBooks.map((book, index) => (
-            <MinCard
-              key={index}
-              id={book.id}
-              name={book.name}
-              author={book.author}
-              imageUrl={book.imageUrl}
-              status={book.status}
-              remainingDays={getRemainingDays(book.takenDate)}
-            />
-          ))
+          <div
+            className={classNames(classes.wrapper, classesOrders.wrapperHeight)}
+          >
+            {waitingBooks.map((book) => (
+              <MinCard
+                key={`${book.id}-waiting`}
+                {...book}
+                remainingDays={getRemainingDays(book.takenDate)}
+              />
+            ))}
+          </div>
         ) : (
-          <p>No books in the waiting list</p>
+          <p className={classesOrders.message}>
+            Oops! You are not waiting for any book
+          </p>
         )}
       </Container>
 
-      <h2>List of your books</h2>
-      <Container className={classes.wrapper}>
+      <Container className={classesOrders.wrap}>
+        <h2 className={classesOrders.title}>List of your books</h2>
         {takenBooks.length > 0 ? (
-          takenBooks.map((data) => (
-            <MinCard
-              key={data.id}
-              {...data}
-              remainingDays={getRemainingDays(data.takenDate)}
-            />
-          ))
+          <div
+            className={classNames(classes.wrapper, classesOrders.wrapperHeight)}
+          >
+            {takenBooks.map((data) => (
+              <MinCard
+                key={`${data.id}-taken`}
+                {...data}
+                remainingDays={getRemainingDays(data.takenDate)}
+              />
+            ))}
+          </div>
         ) : (
-          <p>No books available</p>
+          <p className={classesOrders.message}>
+            Oops! You haven't added any book yet
+          </p>
         )}
       </Container>
-    </div>
+    </>
   );
 };
-

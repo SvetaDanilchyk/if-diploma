@@ -2,7 +2,6 @@
 
 import { AUTH_STATUSES } from "./authStatuses";
 
-
 export const INITIAL_STATE = {
   auth: {
     status: AUTH_STATUSES.loggedOut,

@@ -6,21 +6,28 @@ import { useHomeStyles } from "./Home.styles";
 import { MinCard } from "../MinCard";
 import { Container } from "../Container";
 
-
 export const Home = () => {
   const classes = useHomeStyles();
   const [visibleBooks, setVisibleBooks] = useState(4);
-  const { homeBooks, searchResults, searchFlag, error } = useSelector((state) => state.search);
+  const { homeBooks, searchResults, searchFlag, error } = useSelector(
+    (state) => state.search,
+  );
 
+  // Handler for the "Show more" button
   const handleButtonClick = () => {
     setVisibleBooks((prev) => prev + 4);
-  }
+  };
 
-  const displayedBooks = useMemo(
-    () => homeBooks.slice(0, visibleBooks),
-    [homeBooks, visibleBooks]
-  );
- 
+  // Memoized list of books to display
+  const displayedBooks = useMemo(() => {
+    if (!Array.isArray(homeBooks)) {
+      console.error("homeBooks is not an array:", homeBooks);
+      return [];
+    }
+    return homeBooks.slice(0, visibleBooks);
+  }, [homeBooks, visibleBooks]);
+
+  console.log("displayedBooks - ", displayedBooks);
   if (error) {
     return <p>Error: {error}</p>;
   }
@@ -28,22 +35,26 @@ export const Home = () => {
   return (
     <article className={classes.root}>
       <Container>
-      {searchFlag ? (
+        {searchFlag ? (
           <div className={classes.wrapper}>
             {searchResults.length > 0 ? (
-                searchResults.map((data) => <MinCard key={data.id} {...data} />)
+              searchResults.map((data) => <MinCard key={data.id} {...data} />)
             ) : (
               <p>No search results found</p>
             )}
-           
           </div>
         ) : (
-          <div className={classes.wrapper}>
-            {displayedBooks.length > 0 ? (
-              displayedBooks.map((data) => <MinCard key={data.id} {...data} />)
-            ) : (
-              <p>No books Homes available</p>
-            )}
+          <div className={classes.booksSection}>
+            <h2 className={classes.title}>All books</h2>
+            <div className={classes.wrapper}>
+              {displayedBooks.length > 0 ? (
+                displayedBooks.map((data) => (
+                  <MinCard key={data.id} {...data} />
+                ))
+              ) : (
+                <p>No books Homes available</p>
+              )}
+            </div>
             {visibleBooks < homeBooks.length && (
               <div className={classes.warpBtn}>
                 <button className={classes.btnMore} onClick={handleButtonClick}>

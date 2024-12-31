@@ -6,7 +6,6 @@ export const PAGE = {
   bookDetails: "bookDetails/:bookId",
   userOrders: "orders",
   settings: "/settings",
-  
 };
 
 export const PATH = {

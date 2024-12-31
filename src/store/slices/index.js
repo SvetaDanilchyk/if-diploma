@@ -6,7 +6,7 @@ import { authReducer } from "./auth.slice";
 import { registrReducer } from "./registration.slice";
 import { userReducer } from "./user.slice";
 import { searchReducer } from "./search.slice";
-import booksReducer from './books.slice';
+import booksReducer from "./books.slice";
 //services
 
 const persistConfig = {
@@ -15,7 +15,7 @@ const persistConfig = {
 };
 
 const rootReducer = combineReducers({
-  auth: authReducer,  
+  auth: authReducer,
   registration: registrReducer,
   user: userReducer,
   search: searchReducer,

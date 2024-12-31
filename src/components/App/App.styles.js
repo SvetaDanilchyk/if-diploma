@@ -1,4 +1,5 @@
 import { createUseStyles } from "react-jss";
+import "../../fonts/fonts.css";
 
 export const theme = {
   primaryAccent: "#ff5d4f",
@@ -8,17 +9,19 @@ export const theme = {
   mutedSecondary: "b5b5b5",
   mainHighlight: "#85c8ee",
   backgroundColor: "#d3ebf9",
-  colWidth: "calc(100% / 12)",
 };
 
 export const appStyles = {
   "*": {
     margin: 0,
-    boxSizing: "border-box",
-    fontFamily: '"Roboto", sans-serif',
+  },
+  "@global": {
+    body: {
+      fontFamily: '"OpenSans", sans-serif',
+    },
   },
   font: {
-    fontFamily: "Roboto, sans-serif",
+    fontFamily: '"OpenSans", sans-serif',
   },
 };
 

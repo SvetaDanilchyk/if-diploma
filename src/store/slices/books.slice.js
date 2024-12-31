@@ -1,35 +1,62 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createSelector } from "@reduxjs/toolkit";
+
+export const selectAllBooks = (state) => state.books.allBooks;
+export const selectAllUserBooks = (state) => state.books.userBooks;
+export const selectAllWaitingBooks = (state) => state.books.waitingBooks;
+
+export const selectUserBooks = createSelector(
+  [selectAllUserBooks, (state, userId) => userId],
+  (userBooks, userId) => userBooks[userId] || [],
+);
+
+export const selectWaitingBooks = createSelector(
+  [selectAllWaitingBooks, (state, userId) => userId],
+  (waitingBooks, userId) => waitingBooks[userId] || [],
+);
 
 const initialState = {
   userBooks: {},
   waitingBooks: {},
   allBooks: [],
-  
 };
 
-
 const booksSlice = createSlice({
-  name: 'books',
+  name: "books",
   initialState,
   reducers: {
     addUserBook: (state, action) => {
-      const { userId, book } = action.payload;
+      const { userId, book, userName } = action.payload;
+
+      // Add a book to userBooks
       if (!state.userBooks[userId]) {
         state.userBooks[userId] = [];
       }
 
-      const existingBook = state.userBooks[userId].find(b => b.id === book.id);
+      const existingBook = state.userBooks[userId].find(
+        (b) => b.id === book.id,
+      );
       if (!existingBook) {
-        const fullBookData = {
+        state.userBooks[userId].push({
           ...book,
           status: "Taken",
-          takenDate: Date.now()
-        };
-        state.userBooks[userId].push(fullBookData);
+          bookholder: userName,
+        });
       }
-   
-      localStorage.setItem('userBooks', JSON.stringify(state.userBooks));
-    },   
+
+      // Synchronization with allBooks
+      const bookInAllBooks = state.allBooks.find((b) => b.id === book.id);
+      if (!bookInAllBooks) {
+        state.allBooks.push({
+          ...book,
+          status: "Taken",
+          bookholder: userName,
+        });
+      } else {
+        bookInAllBooks.status = "Taken";
+        bookInAllBooks.bookholder = userName;
+      }
+    },
+
     addUserWaitingBook: (state, action) => {
       const { userId, book } = action.payload;
 
@@ -37,55 +64,91 @@ const booksSlice = createSlice({
         state.waitingBooks[userId] = [];
       }
 
-      const existingBook = state.waitingBooks[userId].find(b => b.id === book.id);
-
+      const existingBook = state.waitingBooks[userId].find(
+        (b) => b.id === book.id,
+      );
       if (!existingBook) {
-        const waitingBook = {
+        state.waitingBooks[userId].push({
           ...book,
           status: "Waiting for",
-          takenDate: Date.now()
-        };
-        state.waitingBooks[userId].push(waitingBook);
+          takenDate: Date.now(),
+        });
       }
-   
-      localStorage.setItem('waitingBooks', JSON.stringify(state.waitingBooks));
     },
+
+    removeUserBook: (state, action) => {
+      const { userId, bookId } = action.payload;
+
+      if (state.userBooks[userId]) {
+        state.userBooks[userId] = state.userBooks[userId].filter(
+          (book) => book.id !== bookId,
+        );
+      }
+
+      if (state.waitingBooks[userId]) {
+        state.waitingBooks[userId] = state.waitingBooks[userId].filter(
+          (book) => book.id !== bookId,
+        );
+      }
+
+      // We update only the "Available" status for books that were in "Taken"
+      const bookInAllBooks = state.allBooks.find(
+        (b) => b.id === bookId && b.status === "Taken",
+      );
+      if (bookInAllBooks) {
+        bookInAllBooks.status = "Available";
+        bookInAllBooks.bookholder = null;
+      }
+    },
+
     checkBookExpiry: (state) => {
       const now = Date.now();
       const ONE_DAY_MS = 86400000;
-      const maxDuration =  20 * ONE_DAY_MS; 
-    
-        Object.keys(state.waitingBooks).forEach((userId) => {
+      const maxDuration = ONE_DAY_MS * 20;
+
+      Object.keys(state.waitingBooks).forEach((userId) => {
         const waitingList = state.waitingBooks[userId] || [];
-    
+
         waitingList.forEach((book, index) => {
           const elapsedTime = now - new Date(book.takenDate).getTime();
-    
+
           if (elapsedTime > maxDuration) {
-            const nextUserId = Object.keys(state.waitingBooks).find((waitingUserId) =>
-              state.waitingBooks[waitingUserId].some((waitingBook) => waitingBook.id === book.id)
+            console.log("maxDuration", maxDuration);
+            const nextUserId = Object.keys(state.waitingBooks).find(
+              (waitingUserId) =>
+                state.waitingBooks[waitingUserId].some(
+                  (waitingBook) => waitingBook.id === book.id,
+                ),
             );
-    
+
             if (nextUserId) {
-              const waitingBook = state.waitingBooks[nextUserId].find((b) => b.id === book.id);
-    
+              const waitingBook = state.waitingBooks[nextUserId].find(
+                (b) => b.id === book.id,
+              );
+
               Object.keys(state.userBooks).forEach((otherUserId) => {
                 if (otherUserId !== nextUserId) {
                   const userBooks = state.userBooks[otherUserId] || [];
-                  state.userBooks[otherUserId] = userBooks.filter((b) => b.id !== book.id);
+                  state.userBooks[otherUserId] = userBooks.filter(
+                    (b) => b.id !== book.id,
+                  );
                 }
               });
-    
+
               state.userBooks[nextUserId] = state.userBooks[nextUserId] || [];
               state.userBooks[nextUserId].push({
                 ...waitingBook,
                 status: "Taken",
                 takenDate: now,
               });
-    
-              state.waitingBooks[nextUserId] = state.waitingBooks[nextUserId].filter((b) => b.id !== book.id);
+
+              state.waitingBooks[nextUserId] = state.waitingBooks[
+                nextUserId
+              ].filter((b) => b.id !== book.id);
             } else {
-              const bookInAllBooks = state.allBooks.find((b) => b.id === book.id);
+              const bookInAllBooks = state.allBooks.find(
+                (b) => b.id === book.id,
+              );
               if (bookInAllBooks) {
                 bookInAllBooks.status = "Available";
               }
@@ -94,41 +157,24 @@ const booksSlice = createSlice({
             waitingList.splice(index, 1);
           }
         });
-    
+
         state.waitingBooks[userId] = waitingList;
       });
-    
-      localStorage.setItem("userBooks", JSON.stringify(state.userBooks));
-      localStorage.setItem("waitingBooks", JSON.stringify(state.waitingBooks));
-      localStorage.setItem("allBooks", JSON.stringify(state.allBooks));
     },
-    
-    removeUserBook: (state, action) => {
-      const { userId, bookId } = action.payload;
-
-      if (state.userBooks[userId]) {
-        state.userBooks[userId] = state.userBooks[userId].filter(book => book.id !== bookId);
-      }
-
-      if (state.waitingBooks[userId]) {
-        state.waitingBooks[userId] = state.waitingBooks[userId].filter(book => book.id !== bookId);
-      }
-
-      localStorage.setItem('userBooks', JSON.stringify(state.userBooks));
-      localStorage.setItem('waitingBooks', JSON.stringify(state.waitingBooks));
+    loadBooksFromLocalStorage: (state, action) => {
+      const { userBooks, waitingBooks, allBooks } = action.payload;
+      state.userBooks = userBooks || {};
+      state.waitingBooks = waitingBooks || {};
+      state.allBooks = allBooks || [];
     },
-
-
-    loadUserBooksFromLocalStorage: (state) => {
-      const savedUserBooks = JSON.parse(localStorage.getItem('userBooks')) || {};
-      state.userBooks = savedUserBooks;
-
-      const savedWaitingBooks = JSON.parse(localStorage.getItem('waitingBooks')) || {};
-      state.waitingBooks = savedWaitingBooks;
-    },
-  }
+  },
 });
 
-
-export const { addUserBook, addUserWaitingBook, checkBookExpiry, removeUserBook, loadUserBooksFromLocalStorage } = booksSlice.actions;
+export const {
+  addUserBook,
+  addUserWaitingBook,
+  removeUserBook,
+  checkBookExpiry,
+  loadBooksFromLocalStorage,
+} = booksSlice.actions;
 export default booksSlice.reducer;
